@@ -2,6 +2,7 @@ package config
 
 import (
 	parkingzone "spotsync/internal/domain/parking_zone"
+	"spotsync/internal/domain/reservation"
 	"spotsync/internal/domain/user"
 
 	"gorm.io/driver/postgres"
@@ -20,6 +21,7 @@ func ConnectDatabase(cfg *Config) *gorm.DB {
 	db.AutoMigrate(
 		&user.User{},
 		&parkingzone.ParkingZone{},
+		&reservation.Reservation{},
 	)
 
 	println("Database connection successful")
