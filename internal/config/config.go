@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -14,10 +13,7 @@ type Config struct {
 }
 
 func LoadEnv() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
 	return &Config{
 		Port:      os.Getenv("PORT"),
