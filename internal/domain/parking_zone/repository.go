@@ -3,6 +3,8 @@ package parkingzone
 import (
 	"spotsync/internal/domain/parking_zone/dto"
 
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -48,7 +50,7 @@ func (r *repository) GetAllZones() ([]dto.ZoneResponse, error) {
 			TotalCapacity:  zone.TotalCapacity,
 			AvailableSpots: zone.TotalCapacity - int(activeCount),
 			PricePerHour:   zone.PricePerHour,
-			CreatedAt:      zone.CreatedAt.String(),
+			CreatedAt:      zone.CreatedAt.UTC().Format(time.RFC3339),
 		})
 	}
 	return responses, nil
@@ -72,7 +74,7 @@ func (r *repository) GetZoneByID(id uint) (*dto.ZoneResponse, error) {
 		TotalCapacity:  zone.TotalCapacity,
 		AvailableSpots: zone.TotalCapacity - int(activeCount),
 		PricePerHour:   zone.PricePerHour,
-		CreatedAt:      zone.CreatedAt.String(),
+		CreatedAt:      zone.CreatedAt.UTC().Format(time.RFC3339),
 	}, nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"spotsync/internal/auth"
 	"spotsync/internal/domain/user/dto"
+	"time"
 )
 
 var ErrInvalidCredentials = errors.New("invalid email or password")
@@ -48,8 +49,8 @@ func (s *service) Register(req dto.RegisterRequest) (*dto.UserResponse, error) {
 		Name:      user.Name,
 		Email:     user.Email,
 		Role:      user.Role,
-		CreatedAt: user.CreatedAt.String(),
-		UpdatedAt: user.UpdatedAt.String(),
+		CreatedAt: user.CreatedAt.UTC().Format(time.RFC3339),
+		UpdatedAt: user.UpdatedAt.UTC().Format(time.RFC3339),
 	}, nil
 }
 

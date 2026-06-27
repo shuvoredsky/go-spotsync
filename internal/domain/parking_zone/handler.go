@@ -6,6 +6,7 @@ import (
 	"spotsync/internal/domain/parking_zone/dto"
 	"spotsync/internal/httpresponse"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -38,7 +39,7 @@ func (h *handler) CreateZone(c echo.Context) error {
 		Type:          zone.Type,
 		TotalCapacity: zone.TotalCapacity,
 		PricePerHour:  zone.PricePerHour,
-		CreatedAt:     zone.CreatedAt.String(),
+		CreatedAt:     zone.CreatedAt.UTC().Format(time.RFC3339),
 	}))
 }
 
@@ -91,7 +92,7 @@ func (h *handler) UpdateZone(c echo.Context) error {
 		Type:          zone.Type,
 		TotalCapacity: zone.TotalCapacity,
 		PricePerHour:  zone.PricePerHour,
-		CreatedAt:     zone.CreatedAt.String(),
+		CreatedAt:     zone.CreatedAt.UTC().Format(time.RFC3339),
 	}))
 }
 

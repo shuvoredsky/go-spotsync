@@ -2,6 +2,7 @@ package reservation
 
 import (
 	"spotsync/internal/domain/reservation/dto"
+	"time"
 )
 
 type Service interface {
@@ -31,8 +32,8 @@ func (s *service) CreateReservation(userID uint, req dto.CreateReservationReques
 		ZoneID:       reservation.ZoneID,
 		LicensePlate: reservation.LicensePlate,
 		Status:       reservation.Status,
-		CreatedAt:    reservation.CreatedAt.String(),
-		UpdatedAt:    reservation.UpdatedAt.String(),
+		CreatedAt:    reservation.CreatedAt.UTC().Format(time.RFC3339),
+		UpdatedAt:    reservation.UpdatedAt.UTC().Format(time.RFC3339),
 	}, nil
 }
 
@@ -53,7 +54,7 @@ func (s *service) GetMyReservations(userID uint) ([]dto.MyReservationResponse, e
 				Name: r.Zone.Name,
 				Type: r.Zone.Type,
 			},
-			CreatedAt: r.CreatedAt.String(),
+			CreatedAt: r.CreatedAt.UTC().Format(time.RFC3339),
 		})
 	}
 	return responses, nil
