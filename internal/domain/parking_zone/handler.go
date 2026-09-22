@@ -6,6 +6,7 @@ import (
 	"spotsync/internal/domain/parking_zone/dto"
 	"spotsync/internal/httpresponse"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -75,11 +76,15 @@ func (h *handler) UpdateZone(c echo.Context) error {
 		if errors.Is(err, ErrZoneNotFound) {
 			return c.JSON(http.StatusNotFound, httpresponse.NewError("Zone not found", nil))
 		}
+		if strings.Contains(err.Error(), "cannot reduce capacity below") {
+			return c.JSON(http.StatusBadRequest, httpresponse.NewError("Cannot reduce capacity below active reservations", err.Error()))
+		}
 		return c.JSON(http.StatusInternalServerError, httpresponse.NewError("Failed to update zone", err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, httpresponse.NewSuccess("Parking zone updated successfully", zone))
 }
+
 
 
 func (h *handler) DeleteZone(c echo.Context) error {

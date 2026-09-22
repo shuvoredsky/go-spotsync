@@ -15,7 +15,9 @@ type Repository interface {
 	UpdateZone(zone *ParkingZone) error
 	DeleteZone(id uint) error
 	GetZoneRaw(id uint) (*ParkingZone, error)
+	GetActiveReservationCount(zoneID uint) (int64, error)
 }
+
 
 type repository struct {
 	db *gorm.DB
@@ -93,3 +95,12 @@ func (r *repository) GetZoneRaw(id uint) (*ParkingZone, error) {
 	}
 	return &zone, nil
 }
+
+func (r *repository) GetActiveReservationCount(zoneID uint) (int64, error) {
+	var activeCount int64
+	err := r.db.Table("reservations").
+		Where("zone_id = ? AND status = ? AND deleted_at IS NULL", zoneID, "active").
+		Count(&activeCount).Error
+	return activeCount, err
+}
+

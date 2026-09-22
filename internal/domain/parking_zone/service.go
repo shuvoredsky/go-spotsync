@@ -2,6 +2,7 @@ package parkingzone
 
 import (
 	"errors"
+	"fmt"
 	"spotsync/internal/domain/parking_zone/dto"
 	"time"
 
@@ -78,6 +79,13 @@ func (s *service) UpdateZone(id uint, req dto.UpdateZoneRequest) (*dto.ZoneRespo
 		zone.Type = req.Type
 	}
 	if req.TotalCapacity > 0 {
+		activeCount, err := s.repo.GetActiveReservationCount(id)
+		if err != nil {
+			return nil, err
+		}
+		if req.TotalCapacity < int(activeCount) {
+			return nil, fmt.Errorf("cannot reduce capacity below %d active reservations", activeCount)
+		}
 		zone.TotalCapacity = req.TotalCapacity
 	}
 	if req.PricePerHour > 0 {
@@ -91,6 +99,7 @@ func (s *service) UpdateZone(id uint, req dto.UpdateZoneRequest) (*dto.ZoneRespo
 	// Fetch refreshed zone with dynamically computed available spots
 	return s.repo.GetZoneByID(id)
 }
+
 
 
 func (s *service) DeleteZone(id uint) error {
