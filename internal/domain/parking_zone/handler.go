@@ -6,7 +6,6 @@ import (
 	"spotsync/internal/domain/parking_zone/dto"
 	"spotsync/internal/httpresponse"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -33,14 +32,7 @@ func (h *handler) CreateZone(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, httpresponse.NewError("Failed to create zone", err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, httpresponse.NewSuccess("Parking zone created successfully", dto.ZoneResponse{
-		ID:            zone.ID,
-		Name:          zone.Name,
-		Type:          zone.Type,
-		TotalCapacity: zone.TotalCapacity,
-		PricePerHour:  zone.PricePerHour,
-		CreatedAt:     zone.CreatedAt.UTC().Format(time.RFC3339),
-	}))
+	return c.JSON(http.StatusCreated, httpresponse.NewSuccess("Parking zone created successfully", zone))
 }
 
 func (h *handler) GetAllZones(c echo.Context) error {
@@ -86,15 +78,9 @@ func (h *handler) UpdateZone(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, httpresponse.NewError("Failed to update zone", err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, httpresponse.NewSuccess("Parking zone updated successfully", dto.ZoneResponse{
-		ID:            zone.ID,
-		Name:          zone.Name,
-		Type:          zone.Type,
-		TotalCapacity: zone.TotalCapacity,
-		PricePerHour:  zone.PricePerHour,
-		CreatedAt:     zone.CreatedAt.UTC().Format(time.RFC3339),
-	}))
+	return c.JSON(http.StatusOK, httpresponse.NewSuccess("Parking zone updated successfully", zone))
 }
+
 
 func (h *handler) DeleteZone(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))

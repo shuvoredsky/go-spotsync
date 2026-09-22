@@ -3,6 +3,7 @@ package parkingzone
 import (
 	"errors"
 	"spotsync/internal/domain/parking_zone/dto"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -10,10 +11,10 @@ import (
 var ErrZoneNotFound = errors.New("parking zone not found")
 
 type Service interface {
-	CreateZone(req dto.CreateZoneRequest) (*ParkingZone, error)
+	CreateZone(req dto.CreateZoneRequest) (*dto.ZoneResponse, error)
 	GetAllZones() ([]dto.ZoneResponse, error)
 	GetZoneByID(id uint) (*dto.ZoneResponse, error)
-	UpdateZone(id uint, req dto.UpdateZoneRequest) (*ParkingZone, error)
+	UpdateZone(id uint, req dto.UpdateZoneRequest) (*dto.ZoneResponse, error)
 	DeleteZone(id uint) error
 }
 
@@ -25,7 +26,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateZone(req dto.CreateZoneRequest) (*ParkingZone, error) {
+func (s *service) CreateZone(req dto.CreateZoneRequest) (*dto.ZoneResponse, error) {
 	zone := &ParkingZone{
 		Name:          req.Name,
 		Type:          req.Type,
@@ -35,7 +36,15 @@ func (s *service) CreateZone(req dto.CreateZoneRequest) (*ParkingZone, error) {
 	if err := s.repo.CreateZone(zone); err != nil {
 		return nil, err
 	}
-	return zone, nil
+	return &dto.ZoneResponse{
+		ID:             zone.ID,
+		Name:           zone.Name,
+		Type:           zone.Type,
+		TotalCapacity:  zone.TotalCapacity,
+		AvailableSpots: zone.TotalCapacity, // Brand new zone has 0 reservations
+		PricePerHour:   zone.PricePerHour,
+		CreatedAt:      zone.CreatedAt.UTC().Format(time.RFC3339),
+	}, nil
 }
 
 func (s *service) GetAllZones() ([]dto.ZoneResponse, error) {
@@ -53,7 +62,7 @@ func (s *service) GetZoneByID(id uint) (*dto.ZoneResponse, error) {
 	return zone, nil
 }
 
-func (s *service) UpdateZone(id uint, req dto.UpdateZoneRequest) (*ParkingZone, error) {
+func (s *service) UpdateZone(id uint, req dto.UpdateZoneRequest) (*dto.ZoneResponse, error) {
 	zone, err := s.repo.GetZoneRaw(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -78,8 +87,11 @@ func (s *service) UpdateZone(id uint, req dto.UpdateZoneRequest) (*ParkingZone, 
 	if err := s.repo.UpdateZone(zone); err != nil {
 		return nil, err
 	}
-	return zone, nil
+
+	// Fetch refreshed zone with dynamically computed available spots
+	return s.repo.GetZoneByID(id)
 }
+
 
 func (s *service) DeleteZone(id uint) error {
 	_, err := s.repo.GetZoneRaw(id)
