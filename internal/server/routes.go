@@ -4,6 +4,7 @@ import (
 	"spotsync/internal/auth"
 	parkingzone "spotsync/internal/domain/parking_zone"
 	"spotsync/internal/domain/reservation"
+	"spotsync/internal/domain/upload"
 	"spotsync/internal/domain/user"
 
 	"github.com/labstack/echo/v4"
@@ -14,4 +15,6 @@ func registerRoutes(e *echo.Echo, db *gorm.DB, jwtService auth.JWTService) {
 	user.RegisterRoutes(e, db, jwtService)
 	parkingzone.RegisterRoutes(e, db, jwtService)
 	reservation.RegisterRoutes(e, db, jwtService)
+	upload.RegisterRoutes(e, jwtService)
 }
+

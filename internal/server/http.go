@@ -26,7 +26,8 @@ func Start(db *gorm.DB, cfg *config.Config) {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
 	}))
 
 	// validator
@@ -35,9 +36,13 @@ func Start(db *gorm.DB, cfg *config.Config) {
 	// jwt service
 	jwtService := auth.NewJWTService(cfg.JwtSecret)
 
+	// static files
+	e.Static("/uploads", "uploads")
+
 	// register routes (add korbo ekta ekta kore)
 	registerRoutes(e, db, jwtService)
 
 	// start server
 	e.Logger.Fatal(e.Start(":" + cfg.Port))
 }
+

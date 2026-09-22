@@ -75,10 +75,13 @@ func (s *service) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 	return &dto.LoginResponse{
 		Token: token,
 		User: dto.UserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-			Role:  user.Role,
+			ID:        user.ID,
+			Name:      user.Name,
+			Email:     user.Email,
+			Role:      user.Role,
+			CreatedAt: user.CreatedAt.UTC().Format(time.RFC3339),
+			UpdatedAt: user.UpdatedAt.UTC().Format(time.RFC3339),
 		},
 	}, nil
 }
+
